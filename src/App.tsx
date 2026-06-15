@@ -13,12 +13,7 @@ import OurMission from './pages/OurMission';
 import Members from './pages/Members';
 import QA from './pages/QA';
 
-// Temporary placeholders for pages we haven't built yet
-const Placeholder = ({ title }: { title: string }) => (
-  <div className="flex items-center justify-center h-[50vh]">
-    <h2 className="text-3xl font-cursive">{title} Page Coming Soon</h2>
-  </div>
-);
+
 
 function App() {
   return (

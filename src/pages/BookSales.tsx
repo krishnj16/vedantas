@@ -73,7 +73,6 @@
 //   );
 // }
 
-import React from 'react';
 
 // Define the shape of our book data
 interface Book {
