@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-vedanta-blue: #2b5b84;
+  --color-vedanta-peach: #fbdca6;
+  --color-vedanta-orange: #cf6e28;
+  --color-vedanta-brown: #7a3e3e;
+  --font-cursive: "Dancing Script", cursive;
+}
+
+body {
+  background-color: var(--color-vedanta-peach);
+}
