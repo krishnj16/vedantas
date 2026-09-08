@@ -1,6 +1,8 @@
 
-export default function OurTeachers() {
-  const teachers = [
+import { useEffect, useState } from 'react';
+import { getTeachers, type Teacher } from '../sanity/content';
+
+const fallbackTeachers: Teacher[] = [
     {
       id: 'ramakrishna',
       name: 'Sri Ramakrishna',
@@ -31,7 +33,16 @@ export default function OurTeachers() {
       textColor: 'text-vedanta-orange',
       imageAlt: '[Portrait of Swami Vivekananda]'
     }
-  ];
+];
+
+export default function OurTeachers() {
+  const [teachers, setTeachers] = useState<Teacher[]>(fallbackTeachers);
+
+  useEffect(() => {
+    void getTeachers().then((sanityTeachers) => {
+      if (sanityTeachers.length) setTeachers(sanityTeachers);
+    });
+  }, []);
 
   return (
     <div className="max-w-5xl mx-auto space-y-16 animate-in fade-in duration-1000 pb-16">
@@ -74,7 +85,7 @@ export default function OurTeachers() {
                 <div className={`relative aspect-[3/4] bg-white/60 backdrop-blur-sm border-2 border-white/80 p-2 shadow-2xl ${isEven ? 'rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-xl rounded-bl-xl' : 'rounded-tr-[4rem] rounded-bl-[4rem] rounded-tl-xl rounded-br-xl'} overflow-hidden transition-all duration-700 group-hover:-translate-y-2`}>
                   <div className={`w-full h-full bg-slate-200 ${isEven ? 'rounded-tl-[3.5rem] rounded-br-[3.5rem] rounded-tr-lg rounded-bl-lg' : 'rounded-tr-[3.5rem] rounded-bl-[3.5rem] rounded-tl-lg rounded-br-lg'} flex items-center justify-center text-slate-400 font-medium relative overflow-hidden`}>
                     <div className="absolute inset-0 bg-gradient-to-tr from-black/5 to-transparent"></div>
-                    {teacher.imageAlt}
+                    {teacher.imageUrl ? <img src={teacher.imageUrl} alt={teacher.name} className="h-full w-full object-cover" /> : teacher.imageAlt}
                   </div>
                 </div>
               </div>

@@ -1,15 +1,9 @@
 
-// Define the shape of our data
-interface PastEvent {
-  id: string;
-  date: string;
-  description: string;
-  link: string;
-}
+import { useEffect, useState } from 'react';
+import { getEvents, type PastEvent } from '../sanity/content';
 
 export default function PastEvents() {
-  // The data array (Primed for a future Supabase database connection!)
-  const events: PastEvent[] = [
+  const fallbackEvents: PastEvent[] = [
     { id: '1', date: '1 Mar. 2026', description: 'Distribution of milk powder and food distribution to indigent children of the Barangay Horseshoe', link: '#' },
     { id: '2', date: '22 Feb. 2026', description: 'Birthday celebration of Sri Ramakrishna', link: '#' },
     { id: '3', date: '7 Feb. 2026', description: 'Distribution of milk powder to indigent children of the Barangay Horseshoe', link: '#' },
@@ -18,6 +12,13 @@ export default function PastEvents() {
     { id: '6', date: '2 Jan. 2026', description: 'Birthday celebration of Revered Swami Turiyanandaji Maharaj', link: '#' },
     { id: '7', date: '26 Dec. 2025', description: 'Talk by Swami Shrivasananda at Cribs foundation', link: '#' },
   ];
+  const [events, setEvents] = useState<PastEvent[]>(fallbackEvents);
+
+  useEffect(() => {
+    void getEvents().then((sanityEvents) => {
+      if (sanityEvents.length) setEvents(sanityEvents);
+    });
+  }, []);
 
   return (
     <div className="max-w-5xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">

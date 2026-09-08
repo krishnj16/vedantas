@@ -85,7 +85,26 @@
 //   );
 // }
 
+import { useEffect, useState } from 'react';
+import { getHomePage, type HomePage } from '../sanity/content';
+
+const defaultSchedule = [
+  { time: '5:30 AM', description: 'Meditation', accent: 'blue' },
+  { time: '6:30 AM', description: 'Vedic Mantram chanting, recitation from the Bhagavad Gita and Stotrams dedicated to various deities on different days — a sacred journey of devotion.', accent: 'blue' },
+  { time: '5:30 PM', description: 'Evening Vesper (Arati)\nReading from "The Gospel of Sri Ramakrishna"\nMeditation', accent: 'orange' },
+];
+
 export default function Home() {
+  const [homePage, setHomePage] = useState<HomePage | null>(null);
+
+  useEffect(() => {
+    void getHomePage().then(setHomePage);
+  }, []);
+
+  const schedule = homePage?.schedule?.length ? homePage.schedule : defaultSchedule;
+  const gallery = homePage?.gallery ?? [];
+  const email = homePage?.contactEmail ?? 'info.rvsp@gmail.com';
+
   return (
     <div className="space-y-10">
       
@@ -99,7 +118,7 @@ export default function Home() {
           </div>
           <div className="px-8 py-6 text-slate-600 font-medium flex items-center gap-3">
             <span className="flex h-3 w-3 rounded-full bg-blue-400/50"></span>
-            No information encoded yet.
+            {homePage?.announcement || 'No announcements at this time.'}
           </div>
         </div>
 
@@ -110,7 +129,7 @@ export default function Home() {
           </div>
           <div className="px-8 py-6 text-slate-600 font-medium flex items-center gap-3">
             <span className="flex h-3 w-3 rounded-full bg-orange-400/50"></span>
-            No information encoded yet.
+            {homePage?.weeklyThought || 'No thought of the week has been published yet.'}
           </div>
         </div>
       </div>
@@ -135,27 +154,17 @@ export default function Home() {
           <div className="mb-12 bg-white/50 rounded-2xl p-6 border border-white/60 shadow-sm">
             <h3 className="text-sm font-bold tracking-widest text-vedanta-blue uppercase mb-6 border-b border-blue-100 pb-2">Weekday Schedule</h3>
             <div className="space-y-6">
-              <div className="flex flex-col md:flex-row md:items-start gap-4">
-                <div className="bg-vedanta-blue/10 text-vedanta-blue font-bold px-3 py-1 rounded-lg text-sm shrink-0 mt-1">5:30 AM</div>
-                <div className="font-medium text-slate-800">Meditation</div>
-              </div>
-              <div className="flex flex-col md:flex-row md:items-start gap-4">
-                <div className="bg-vedanta-blue/10 text-vedanta-blue font-bold px-3 py-1 rounded-lg text-sm shrink-0 mt-1">6:30 AM</div>
-                <div className="text-slate-600 leading-snug">Vedic Mantram chanting, recitation from the Bhagavad Gita and Stotrams dedicated to various deities on different days <span className="italic text-slate-400">— a sacred journey of devotion.</span></div>
-              </div>
-              <div className="flex flex-col md:flex-row md:items-start gap-4">
-                <div className="bg-vedanta-orange/10 text-vedanta-orange font-bold px-3 py-1 rounded-lg text-sm shrink-0 mt-1">5:30 PM</div>
-                <div className="text-slate-600 leading-snug space-y-1">
-                  <p className="font-medium text-slate-800">Evening Vesper (Arati)</p>
-                  <p>Reading from "The Gospel of Sri Ramakrishna"</p>
-                  <p>Meditation</p>
+              {schedule.map((item) => (
+                <div key={`${item.time}-${item.description}`} className="flex flex-col md:flex-row md:items-start gap-4">
+                  <div className={`${item.accent === 'orange' ? 'bg-vedanta-orange/10 text-vedanta-orange' : 'bg-vedanta-blue/10 text-vedanta-blue'} font-bold px-3 py-1 rounded-lg text-sm shrink-0 mt-1`}>{item.time}</div>
+                  <div className="text-slate-600 leading-snug whitespace-pre-line">{item.description}</div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
 
           <p className="mb-8 p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 text-slate-700">
-            Anyone wishing to visit our Centre for personal meditation, private meetings with our spiritual minister, or book purchases, is kindly requested to make an appointment beforehand by emailing: <a href="mailto:info.rvsp@gmail.com" className="text-vedanta-blue font-bold hover:underline decoration-2 underline-offset-4">info.rvsp@gmail.com</a>
+            Anyone wishing to visit our Centre for personal meditation, private meetings with our spiritual minister, or book purchases, is kindly requested to make an appointment beforehand by emailing: <a href={`mailto:${email}`} className="text-vedanta-blue font-bold hover:underline decoration-2 underline-offset-4">{email}</a>
           </p>
 
           <blockquote className="relative p-8 mt-12 bg-gradient-to-br from-vedanta-brown/5 to-transparent rounded-2xl border border-vedanta-brown/10">
@@ -171,15 +180,15 @@ export default function Home() {
 
         {/* Right Image Gallery (2026 Hover Interactions) */}
         <div className="w-full lg:w-72 flex flex-col gap-6 flex-shrink-0">
-          {[
+          {(gallery.length ? gallery : [
             { label: 'Ashram Gates', height: 'h-48' },
             { label: 'Inner Sanctum', height: 'h-48' },
             { label: 'Library Collection', height: 'h-48' },
             { label: 'Outdoor Shrine', height: 'h-72' }
-          ].map((img, i) => (
-            <div key={i} className={`group relative ${img.height} w-full rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 bg-slate-200 cursor-pointer`}>
+          ]).map((img, i) => (
+            <div key={`${img.label}-${i}`} className={`group relative ${img.height ?? (i === 3 ? 'h-72' : 'h-48')} w-full rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 bg-slate-200 cursor-pointer`}>
               {/* Image Placeholder Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 group-hover:scale-110 transition-transform duration-700 ease-in-out"></div>
+              {img.imageUrl ? <img src={img.imageUrl} alt={img.alt || img.label} className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" /> : <div className="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 group-hover:scale-110 transition-transform duration-700 ease-in-out"></div>}
               
               {/* Overlay Label */}
               <div className="absolute inset-0 bg-gradient-to-t from-vedanta-blue/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
@@ -189,9 +198,9 @@ export default function Home() {
               </div>
               
               {/* Temporary Text (Remove when you add real <img> tags) */}
-              <div className="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm group-hover:opacity-0 transition-opacity">
+              {!img.imageUrl && <div className="absolute inset-0 flex items-center justify-center text-slate-400 font-medium text-sm group-hover:opacity-0 transition-opacity">
                 [Add Photo Here]
-              </div>
+              </div>}
             </div>
           ))}
         </div>
