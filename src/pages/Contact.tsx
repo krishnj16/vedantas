@@ -1,5 +1,11 @@
 
+import { useEffect, useState } from 'react';
+import { getContactPage, type ContactPage } from '../sanity/content';
+
 export default function Contact() {
+  const [contactPage, setContactPage] = useState<ContactPage | null>(null);
+  useEffect(() => { void getContactPage().then(setContactPage); }, []);
+  const email = contactPage?.email || 'info.rvsp@gmail.com';
   return (
     <div className="max-w-5xl mx-auto space-y-12 animate-in fade-in duration-700">
       
@@ -24,7 +30,7 @@ export default function Contact() {
             </h2>
             <p className="text-slate-600 leading-relaxed mb-6">
               The Ramakrishna Vedanta Society of the Philippines is located at:<br/>
-              <strong className="text-slate-800">25 Hilltop Street (St. Peter Street), Barangay Horseshoe, Quezon City, 1112 Metro Manila.</strong>
+              <strong className="text-slate-800 whitespace-pre-line">{contactPage?.address || '25 Hilltop Street (St. Peter Street), Barangay Horseshoe, Quezon City, 1112 Metro Manila.'}</strong>
             </p>
 
             <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -32,19 +38,14 @@ export default function Contact() {
               Contact
             </h2>
             <div className="space-y-2 text-slate-600">
-              <p>Email: <a href="mailto:info.rvsp@gmail.com" className="text-vedanta-blue font-bold hover:underline">info.rvsp@gmail.com</a></p>
-              <p>Landline: 02 86314114 <span className="text-sm italic text-slate-400">(+63 2 86314114 overseas)</span></p>
+              <p>Email: <a href={`mailto:${email}`} className="text-vedanta-blue font-bold hover:underline">{email}</a></p>
+              <p>Landline: {contactPage?.phone || '02 86314114'} {contactPage?.overseasPhone && <span className="text-sm italic text-slate-400">({contactPage.overseasPhone})</span>}</p>
             </div>
           </div>
 
           {/* Directions Text */}
           <div className="bg-vedanta-blue/5 border border-vedanta-blue/10 rounded-2xl p-6 text-sm text-slate-700 leading-relaxed shadow-inner">
-            <p className="mb-3">
-              The Society can be reached by car from EDSA by turning left (coming from South, if not right coming from North) at P. Tuazon Street, at Cubao Farmer's. Proceed along P. Tuazon until a very distinct landmark is seen, i.e. the "Chocolate Caste".
-            </p>
-            <p>
-              After passing this landmark, St. Peter is the first street to the left. Proceed along St. Peter Street until No. 25 is found (the last house on the right side just before reaching Sacred Heart Street). As an alternative, those entering the main Horseshoe Village entrance along N. Domingo Street may proceed along Horseshoe Drive until they find Hilltop Street.
-            </p>
+            {(contactPage?.directions?.length ? contactPage.directions : ["The Society can be reached by car from EDSA by turning left (coming from South, if not right coming from North) at P. Tuazon Street, at Cubao Farmer's.", 'Please make an appointment before visiting.']).map((direction, index) => <p key={index} className={index === 0 ? 'mb-3' : ''}>{direction}</p>)}
           </div>
         </div>
 
@@ -52,11 +53,11 @@ export default function Contact() {
         <div className="bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 rotate-1 hover:rotate-0 transition-transform duration-500">
           <h3 className="text-center font-bold text-slate-800 mb-4 uppercase tracking-widest text-sm">Vicinity Map</h3>
           {/* Map Placeholder - Ready for a real image or Google Maps iframe */}
-          <div className="aspect-square w-full bg-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-300 relative overflow-hidden group cursor-pointer">
+          {contactPage?.mapEmbedUrl ? <iframe title="Society location map" src={contactPage.mapEmbedUrl} className="aspect-square w-full rounded-2xl border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /> : contactPage?.mapImageUrl ? <img src={contactPage.mapImageUrl} alt={contactPage.mapImageAlt || 'Map showing the Society location'} className="aspect-square w-full rounded-2xl object-cover" /> : <div className="aspect-square w-full bg-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-300 relative overflow-hidden group cursor-pointer">
             <div className="absolute inset-0 bg-gradient-to-tr from-vedanta-blue/5 to-transparent"></div>
             <svg className="w-12 h-12 mb-2 text-slate-300 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
             <span>[Insert Map Image Here]</span>
-          </div>
+          </div>}
           <p className="text-center text-xs text-slate-500 mt-4 italic">
             Please make an appointment before visiting.
           </p>

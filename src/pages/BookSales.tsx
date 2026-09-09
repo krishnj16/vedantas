@@ -1,4 +1,6 @@
 // import React from 'react';
+import { useEffect, useState } from 'react';
+import { getBooks, type Book as CmsBook } from '../sanity/content';
 
 // // Define the shape of our book data
 // interface Book {
@@ -80,6 +82,9 @@ interface Book {
   title: string;
   author: string;
   category: string;
+  available?: boolean;
+  coverUrl?: string;
+  coverAlt?: string;
 }
 
 export default function BookSales() {
@@ -91,6 +96,9 @@ export default function BookSales() {
     { id: '5', title: 'Karma Yoga', author: 'Swami Vivekananda', category: 'Philosophy' },
     { id: '6', title: 'Meditation and Its Methods', author: 'Swami Vivekananda', category: 'Practice' },
   ];
+  const [cmsBooks, setCmsBooks] = useState<CmsBook[]>([]);
+  useEffect(() => { void getBooks().then(setCmsBooks); }, []);
+  const displayBooks = cmsBooks.length ? cmsBooks : books;
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 animate-in fade-in duration-700">
@@ -117,7 +125,7 @@ export default function BookSales() {
 
       {/* Book Catalog Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {books.map((book) => (
+        {displayBooks.filter((book) => book.available !== false).map((book) => (
           <div key={book.id} className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group flex flex-col h-full">
             
             {/* Monastic Saffron Gradient Border Wrapper */}
@@ -129,7 +137,7 @@ export default function BookSales() {
                 {/* Saffron Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-t from-vedanta-brown/90 via-vedanta-orange/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
                 
-                <span className="text-slate-500 font-medium group-hover:opacity-0 transition-opacity z-0">[Cover Image]</span>
+                {book.coverUrl ? <img src={book.coverUrl} alt={book.coverAlt || book.title} className="absolute inset-0 h-full w-full object-cover" /> : <span className="text-slate-500 font-medium group-hover:opacity-0 transition-opacity z-0">[Cover Image]</span>}
                 
                 {/* Hover Text */}
                 <span className="absolute bottom-6 left-0 right-0 text-center text-white font-bold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-20 drop-shadow-md">

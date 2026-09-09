@@ -1,5 +1,20 @@
 
+import { useEffect, useState } from 'react';
+import { getDonationPage, type DonationPage } from '../sanity/content';
+
 export default function Donate() {
+  const [donationPage, setDonationPage] = useState<DonationPage | null>(null);
+
+  useEffect(() => {
+    void getDonationPage().then(setDonationPage);
+  }, []);
+
+  const photos = donationPage?.heroImages ?? [];
+  const cards = [
+    { label: 'Swami Vivekananda', className: 'w-24 h-32 bg-white/20 backdrop-blur-sm border-2 border-white/50 rounded-t-full rounded-b-xl text-white/70 text-xs p-2 shadow-lg group-hover:-translate-y-2 delay-75' },
+    { label: 'Sri Ramakrishna', className: 'w-32 h-40 bg-white/30 backdrop-blur-md border-2 border-white rounded-t-[3rem] rounded-b-xl text-white font-bold p-2 shadow-xl group-hover:-translate-y-4' },
+    { label: 'Holy Mother', className: 'w-24 h-32 bg-white/20 backdrop-blur-sm border-2 border-white/50 rounded-t-full rounded-b-xl text-white/70 text-xs p-2 shadow-lg group-hover:-translate-y-2 delay-150' },
+  ];
   return (
     <div className="max-w-4xl mx-auto space-y-10 animate-in slide-in-from-bottom-4 duration-700">
       
@@ -13,15 +28,14 @@ export default function Donate() {
         
         {/* Image Placeholders (The Trio) */}
         <div className="relative z-10 flex gap-6 items-end justify-center h-full pb-4">
-          <div className="w-24 h-32 bg-white/20 backdrop-blur-sm border-2 border-white/50 rounded-t-full rounded-b-xl flex items-center justify-center text-white/70 text-xs text-center p-2 shadow-lg group-hover:-translate-y-2 transition-transform duration-500 delay-75">
-            [Swami Vivekananda]
-          </div>
-          <div className="w-32 h-40 bg-white/30 backdrop-blur-md border-2 border-white shadow-xl rounded-t-[3rem] rounded-b-xl flex items-center justify-center text-white font-bold text-center p-2 group-hover:-translate-y-4 transition-transform duration-500">
-            [Sri Ramakrishna]
-          </div>
-          <div className="w-24 h-32 bg-white/20 backdrop-blur-sm border-2 border-white/50 rounded-t-full rounded-b-xl flex items-center justify-center text-white/70 text-xs text-center p-2 shadow-lg group-hover:-translate-y-2 transition-transform duration-500 delay-150">
-            [Holy Mother]
-          </div>
+          {cards.map((card, index) => {
+            const photo = photos[index];
+            return (
+              <div key={card.label} className={`${card.className} relative overflow-hidden flex items-center justify-center text-center transition-transform duration-500`}>
+                {photo?.imageUrl ? <img src={photo.imageUrl} alt={photo.alt || card.label} className="absolute inset-0 h-full w-full object-cover" /> : <span>{card.label}</span>}
+              </div>
+            );
+          })}
         </div>
       </div>
 

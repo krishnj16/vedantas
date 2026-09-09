@@ -1,4 +1,7 @@
 
+import { useEffect, useState } from 'react';
+import { getHistoryPage, type HistoryPage } from '../sanity/content';
+
 export default function OurHistory() {
   const milestones = [
     {
@@ -34,6 +37,15 @@ export default function OurHistory() {
       border: 'border-yellow-500/30'
     }
   ];
+  const [historyPage, setHistoryPage] = useState<HistoryPage | null>(null);
+  useEffect(() => { void getHistoryPage().then(setHistoryPage); }, []);
+  const displayMilestones = historyPage?.milestones?.length ? historyPage.milestones.map((milestone, index) => ({
+    ...milestone,
+    year: milestone.label || (milestone.date ? new Intl.DateTimeFormat('en', { year: 'numeric' }).format(new Date(`${milestone.date}T00:00:00`)) : ''),
+    color: index % 2 ? 'text-vedanta-blue' : 'text-vedanta-orange',
+    bg: index % 2 ? 'bg-vedanta-blue/10' : 'bg-vedanta-orange/10',
+    border: index % 2 ? 'border-vedanta-blue/30' : 'border-vedanta-orange/30',
+  })) : milestones;
 
   return (
     <div className="max-w-5xl mx-auto space-y-16 animate-in fade-in duration-1000 pb-20">
@@ -55,7 +67,7 @@ export default function OurHistory() {
 
       <div className="text-center px-4 md:px-16 relative z-10 mb-16">
         <p className="text-xl text-slate-700 leading-relaxed font-light">
-          From humble beginnings to a sanctuary of peace in the heart of Metro Manila.
+          {historyPage?.intro || 'From humble beginnings to a sanctuary of peace in the heart of Metro Manila.'}
         </p>
       </div>
 
@@ -66,7 +78,7 @@ export default function OurHistory() {
         <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-vedanta-orange/50 via-vedanta-blue/30 to-transparent -translate-x-1/2 rounded-full hidden sm:block"></div>
 
         <div className="space-y-12">
-          {milestones.map((milestone, index) => {
+          {displayMilestones.map((milestone, index) => {
             const isEven = index % 2 === 0;
             return (
               <div key={index} className={`relative flex flex-col sm:flex-row items-center ${isEven ? 'sm:flex-row-reverse' : ''} group`}>

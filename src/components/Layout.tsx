@@ -59,9 +59,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {phone}
             </span>
 
-            <button className="bg-yellow-400 hover:bg-yellow-300 text-vedanta-blue px-4 py-1 rounded-full font-bold transition-all transform hover:scale-105 shadow-sm">
-              Login
-            </button>
           </div>
         </div>
 

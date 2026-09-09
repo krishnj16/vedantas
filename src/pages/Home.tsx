@@ -86,13 +86,28 @@
 // }
 
 import { useEffect, useState } from 'react';
-import { getHomePage, type HomePage } from '../sanity/content';
+import { getHomePage, type HomePage, type ScheduleItem } from '../sanity/content';
 
-const defaultSchedule = [
-  { time: '5:30 AM', description: 'Meditation', accent: 'blue' },
-  { time: '6:30 AM', description: 'Vedic Mantram chanting, recitation from the Bhagavad Gita and Stotrams dedicated to various deities on different days — a sacred journey of devotion.', accent: 'blue' },
-  { time: '5:30 PM', description: 'Evening Vesper (Arati)\nReading from "The Gospel of Sri Ramakrishna"\nMeditation', accent: 'orange' },
+const defaultSchedule: ScheduleItem[] = [
+  { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], startTime: '05:30', title: 'Meditation', accent: 'blue' },
+  { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], startTime: '06:30', title: 'Vedic Mantram chanting', description: 'Recitation from the Bhagavad Gita and Stotrams dedicated to various deities on different days — a sacred journey of devotion.', accent: 'blue' },
+  { days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], startTime: '17:30', title: 'Evening Vesper (Arati)', description: 'Reading from "The Gospel of Sri Ramakrishna"\nMeditation', accent: 'orange' },
 ];
+
+function formatTime(time?: string) {
+  if (!time) return '';
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) return time;
+  const [hour, minute] = time.split(':').map(Number);
+  return new Intl.DateTimeFormat('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date(2000, 0, 1, hour, minute));
+}
+
+function formatDays(days?: string[]) {
+  if (!days?.length) return '';
+  const allWeekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  if (days.length === 5 && allWeekdays.every((day) => days.includes(day))) return 'Weekdays';
+  if (days.length === 7) return 'Daily';
+  return days.join(', ');
+}
 
 export default function Home() {
   const [homePage, setHomePage] = useState<HomePage | null>(null);
@@ -104,6 +119,7 @@ export default function Home() {
   const schedule = homePage?.schedule?.length ? homePage.schedule : defaultSchedule;
   const gallery = homePage?.gallery ?? [];
   const email = homePage?.contactEmail ?? 'info.rvsp@gmail.com';
+  const quote = homePage?.quote ?? { text: 'Religion is realization, not talk, not doctrine, not theories, however beautiful they may be. It is being and becoming, not hearing or acknowledging; it is the whole soul becoming changed into what it believes.', attribution: 'Swami Vivekananda' };
 
   return (
     <div className="space-y-10">
@@ -156,8 +172,11 @@ export default function Home() {
             <div className="space-y-6">
               {schedule.map((item) => (
                 <div key={`${item.time}-${item.description}`} className="flex flex-col md:flex-row md:items-start gap-4">
-                  <div className={`${item.accent === 'orange' ? 'bg-vedanta-orange/10 text-vedanta-orange' : 'bg-vedanta-blue/10 text-vedanta-blue'} font-bold px-3 py-1 rounded-lg text-sm shrink-0 mt-1`}>{item.time}</div>
-                  <div className="text-slate-600 leading-snug whitespace-pre-line">{item.description}</div>
+                  <div className={`${item.accent === 'orange' ? 'bg-vedanta-orange/10 text-vedanta-orange' : 'bg-vedanta-blue/10 text-vedanta-blue'} font-bold px-3 py-1 rounded-lg text-sm shrink-0 mt-1`}>
+                    <span className="block">{formatTime(item.startTime ?? item.time)}{item.endTime ? `–${formatTime(item.endTime)}` : ''}</span>
+                    {formatDays(item.days) && <span className="block mt-1 text-[10px] uppercase tracking-wide opacity-75">{formatDays(item.days)}</span>}
+                  </div>
+                  <div className="text-slate-600 leading-snug whitespace-pre-line"><strong>{item.title}</strong>{item.title && item.description ? ': ' : ''}{item.description}</div>
                 </div>
               ))}
             </div>
@@ -170,10 +189,10 @@ export default function Home() {
           <blockquote className="relative p-8 mt-12 bg-gradient-to-br from-vedanta-brown/5 to-transparent rounded-2xl border border-vedanta-brown/10">
             <svg className="absolute top-4 left-4 w-10 h-10 text-vedanta-brown/10" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
             <p className="italic text-slate-700 relative z-10 text-lg leading-relaxed text-center font-serif">
-              "Religion is realization, not talk, not doctrine, not theories, however beautiful they may be. It is being and becoming, not hearing or acknowledging; it is the whole soul becoming changed into what it believes."
+              “{quote.text}”
             </p>
             <footer className="mt-4 text-center font-bold text-vedanta-brown tracking-wide text-sm uppercase">
-              — Swami Vivekananda
+              — {quote.attribution}
             </footer>
           </blockquote>
         </div>

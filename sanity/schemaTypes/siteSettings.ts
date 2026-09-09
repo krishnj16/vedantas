@@ -5,6 +5,7 @@ export const siteSettings = defineType({
   title: 'Site Settings',
   type: 'document',
   fields: [
-    defineField({ name: 'phone', title: 'Header phone number', type: 'string' }),
+    defineField({ name: 'phone', title: 'Header phone number', type: 'string', validation: (rule) => rule.required() }),
+    defineField({ name: 'email', title: 'Public email address', type: 'string', validation: (rule) => rule.required().email() }),
   ],
 });

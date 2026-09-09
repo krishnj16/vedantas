@@ -1,4 +1,7 @@
 
+import { useEffect, useState } from 'react';
+import { getFAQs, type FAQ } from '../sanity/content';
+
 export default function QA() {
   const faqs = [
     {
@@ -18,6 +21,9 @@ export default function QA() {
       a: "The best way to begin is by attending our regular services to experience the atmosphere of the ashram. For specific instruction, you may request a private appointment with our spiritual minister, who can offer guidance based on your individual temperament."
     }
   ];
+  const [cmsFaqs, setCmsFaqs] = useState<FAQ[]>([]);
+  useEffect(() => { void getFAQs().then(setCmsFaqs); }, []);
+  const displayFaqs = cmsFaqs.length ? cmsFaqs.map(({ question: q, answer: a }) => ({ q, a })) : faqs;
 
   return (
     <div className="max-w-4xl mx-auto space-y-16 animate-in fade-in duration-1000 pb-20">
@@ -42,7 +48,7 @@ export default function QA() {
 
       {/* Q&A List */}
       <div className="space-y-12 px-4 md:px-8">
-        {faqs.map((faq, index) => (
+        {displayFaqs.map((faq, index) => (
           <div key={index} className="bg-[#fdfcf9] rounded-sm p-8 md:p-10 shadow-md shadow-orange-900/5 relative group border border-slate-200">
             
             {/* Subtle left accent line */}
